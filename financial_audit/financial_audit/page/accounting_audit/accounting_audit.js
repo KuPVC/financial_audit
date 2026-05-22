@@ -275,6 +275,48 @@ frappe.pages['accounting-audit'].on_page_show = function(wrapper) {
 }
 .aa-empty i { font-size: 3rem; }
 
+/* ── Pagination ── */
+.aa-pagination {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 6px;
+	padding: 8px 14px;
+	border-top: 1px solid #f1f5f9;
+	background: #fafbfc;
+	font-size: 0.82rem;
+	color: #64748b;
+	flex-wrap: wrap;
+}
+.aa-pg-info { flex: 1; text-align: center; min-width: 120px; }
+.aa-pg-btn {
+	display: inline-flex; align-items: center; justify-content: center;
+	width: 30px; height: 30px;
+	border: 1px solid #e2e8f0;
+	border-radius: 6px;
+	background: #fff;
+	color: #374151;
+	font-size: 0.8rem;
+	cursor: pointer;
+	transition: background .12s, border-color .12s;
+}
+.aa-pg-btn:hover:not(:disabled) { background: #eef2ff; border-color: #6366f1; color: #6366f1; }
+.aa-pg-btn:disabled { opacity: .4; cursor: not-allowed; }
+.aa-pg-num {
+	display: inline-flex; align-items: center; justify-content: center;
+	min-width: 30px; height: 30px;
+	border: 1px solid #e2e8f0;
+	border-radius: 6px;
+	background: #fff;
+	color: #374151;
+	font-size: 0.8rem;
+	cursor: pointer;
+	padding: 0 6px;
+	transition: background .12s, border-color .12s;
+}
+.aa-pg-num:hover { background: #eef2ff; border-color: #6366f1; color: #6366f1; }
+.aa-pg-num.active { background: #6366f1; border-color: #6366f1; color: #fff; cursor: default; }
+
 /* ── Intro banner ── */
 .aa-intro {
 	padding: 16px 20px;
@@ -304,6 +346,9 @@ class AccountingAuditDashboard {
 		this.filtered_findings = [];
 		this.generated_at = null;
 		this.summary = null;
+		this._category_items = {};
+		this._category_pages = {};
+		window._aa_dashboard = this;
 
 		this.setup_page();
 		this.render_skeleton();
@@ -517,13 +562,17 @@ class AccountingAuditDashboard {
 			return;
 		}
 
-		// Group findings by category
+		// Group findings by category (preserve insertion order)
 		const groups = {};
 		findings.forEach(f => {
 			const cat = f.category || 'Other';
 			if (!groups[cat]) groups[cat] = [];
 			groups[cat].push(f);
 		});
+
+		// Reset per-category state
+		this._category_items = {};
+		this._category_pages = {};
 
 		const categoryIcons = {
 			'Company Defaults': 'fa fa-building',
@@ -539,6 +588,10 @@ class AccountingAuditDashboard {
 
 		let html = '';
 		Object.entries(groups).forEach(([category, items]) => {
+			const catKey = category.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+			this._category_items[catKey] = items;
+			this._category_pages[catKey] = 0;
+
 			const counts = { critical: 0, warning: 0, info: 0 };
 			items.forEach(f => { counts[(f.severity || 'Info').toLowerCase()]++; });
 
@@ -549,10 +602,11 @@ class AccountingAuditDashboard {
 			].filter(Boolean).join('');
 
 			const iconClass = categoryIcons[category] || 'fa fa-folder';
-			const rows = items.map(f => this._render_row(f, true)).join('');
+			const firstPageRows = this._render_page_rows(catKey, 0);
+			const pagination    = this._render_pagination(catKey, items.length, 0);
 
 			html += `
-<div class="aa-category-section">
+<div class="aa-category-section" id="aa-section-${catKey}">
 	<div class="aa-category-header" onclick="
 		var body = this.nextElementSibling;
 		body.style.display = body.style.display === 'none' ? '' : 'none';
@@ -576,8 +630,9 @@ class AccountingAuditDashboard {
 					<th>Open</th>
 				</tr>
 			</thead>
-			<tbody>${rows}</tbody>
+			<tbody id="aa-tbody-${catKey}">${firstPageRows}</tbody>
 		</table>
+		<div id="aa-pagination-${catKey}">${pagination}</div>
 	</div>
 </div>`;
 		});
@@ -585,7 +640,73 @@ class AccountingAuditDashboard {
 		container.innerHTML = html;
 	}
 
-	_render_row(f, in_category) {
+	_render_page_rows(catKey, page) {
+		const PAGE_SIZE = 10;
+		const items = this._category_items[catKey] || [];
+		return items
+			.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
+			.map(f => this._render_row(f))
+			.join('');
+	}
+
+	_render_pagination(catKey, total, currentPage) {
+		const PAGE_SIZE  = 10;
+		const totalPages = Math.ceil(total / PAGE_SIZE);
+		if (totalPages <= 1) return '';
+
+		const start = currentPage * PAGE_SIZE + 1;
+		const end   = Math.min((currentPage + 1) * PAGE_SIZE, total);
+
+		// Build page number buttons (window of up to 5 around current)
+		const window_size = 5;
+		let pageStart = Math.max(0, currentPage - Math.floor(window_size / 2));
+		let pageEnd   = Math.min(totalPages - 1, pageStart + window_size - 1);
+		if (pageEnd - pageStart < window_size - 1) {
+			pageStart = Math.max(0, pageEnd - window_size + 1);
+		}
+
+		let pageNums = '';
+		for (let i = pageStart; i <= pageEnd; i++) {
+			const active = i === currentPage ? 'active' : '';
+			const click  = i === currentPage ? '' : `onclick="window._aa_dashboard._go_page('${catKey}', ${i})"`;
+			pageNums += `<button class="aa-pg-num ${active}" ${click}>${i + 1}</button>`;
+		}
+
+		const prevDisabled = currentPage === 0 ? 'disabled' : '';
+		const nextDisabled = currentPage >= totalPages - 1 ? 'disabled' : '';
+
+		return `
+<div class="aa-pagination">
+	<button class="aa-pg-btn" ${prevDisabled}
+		onclick="window._aa_dashboard._go_page('${catKey}', ${currentPage - 1})">
+		<i class="fa fa-chevron-left"></i>
+	</button>
+	${pageNums}
+	<button class="aa-pg-btn" ${nextDisabled}
+		onclick="window._aa_dashboard._go_page('${catKey}', ${currentPage + 1})">
+		<i class="fa fa-chevron-right"></i>
+	</button>
+	<span class="aa-pg-info">${start}–${end} of ${total}</span>
+</div>`;
+	}
+
+	_go_page(catKey, page) {
+		const PAGE_SIZE  = 10;
+		const items      = this._category_items[catKey];
+		if (!items) return;
+
+		const totalPages = Math.ceil(items.length / PAGE_SIZE);
+		page = Math.max(0, Math.min(page, totalPages - 1));
+		this._category_pages[catKey] = page;
+
+		const tbody = document.getElementById(`aa-tbody-${catKey}`);
+		if (tbody) tbody.innerHTML = this._render_page_rows(catKey, page);
+
+		const pgEl = document.getElementById(`aa-pagination-${catKey}`);
+		if (pgEl) pgEl.innerHTML = this._render_pagination(catKey, items.length, page);
+	}
+
+	_render_row(f) {
 		const sev  = (f.severity || 'Info').toLowerCase();
 		const icon = {
 			critical: 'fa fa-exclamation-circle',
