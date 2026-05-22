@@ -197,15 +197,15 @@ def check_salary_components(company_names):
 def check_asset_categories(company_names):
     findings = []
 
+    # In ERPNext v16, tabAsset Category Account uses 'company_name' (not 'company')
     account_fields = [
         ("fixed_asset_account", "Critical", "Fixed Asset Account"),
         ("accumulated_depreciation_account", "Critical", "Accumulated Depreciation Account"),
         ("depreciation_expense_account", "Critical", "Depreciation Expense Account"),
         ("capital_work_in_progress_account", "Warning", "Capital WIP Account"),
-        ("asset_received_but_not_billed", "Warning", "Asset Received But Not Billed"),
     ]
 
-    field_names = ", ".join(["aca.company"] + [f"aca.{f[0]}" for f in account_fields])
+    field_names = ", ".join(["aca.company_name"] + [f"aca.{f[0]}" for f in account_fields])
     rows = frappe.db.sql(
         f"""
         SELECT ac.name AS category, {field_names}
@@ -221,7 +221,7 @@ def check_asset_categories(company_names):
         cat = row["category"]
         if cat not in cat_map:
             cat_map[cat] = {}
-        company = row.get("company")
+        company = row.get("company_name")
         if company:
             cat_map[cat][company] = row
 
@@ -325,14 +325,13 @@ def check_mode_of_payment(company_names):
 def check_item_defaults(company_names):
     findings = []
 
-    # Only check stock items that appear in GL Entry (have transactions)
-    # Use SQL JOIN to find items with missing defaults efficiently
+    # Only check stock items that appear in Stock Ledger Entry (have transactions)
     # Limit to 500 items with transactions to avoid performance issues
     items_with_transactions = frappe.db.sql(
         """
         SELECT DISTINCT i.name, i.item_name
         FROM `tabItem` i
-        INNER JOIN `tabGL Entry` gle ON gle.item_code = i.name
+        INNER JOIN `tabStock Ledger Entry` sle ON sle.item_code = i.name
         WHERE i.is_stock_item = 1 AND i.disabled = 0
         LIMIT 500
         """,
