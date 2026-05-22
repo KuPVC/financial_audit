@@ -515,7 +515,7 @@ class AccountingAuditDashboard {
 		const badge = `<span class="aa-badge aa-badge-${sev}"><i class="${icon}"></i>${f.severity || 'Info'}</span>`;
 
 		const link  = f.link
-			? `<a class="aa-link-btn" href="${frappe.urllib.get_base_url()}/${f.link}" target="_blank">
+			? `<a class="aa-link-btn" href="/${f.link}" target="_blank">
 					<i class="fa fa-external-link"></i> Open
 			   </a>`
 			: '';
@@ -628,17 +628,23 @@ class AccountingAuditDashboard {
 	}
 
 	_refresh_category_options(categories) {
-		if (!this.$category_filter || !this.$category_filter.$input) return;
+		if (!this.$category_filter) return;
 		const current = this.$category_filter.get_value();
-		const opts = [''].concat(categories);
-		this.$category_filter.$input.empty();
-		opts.forEach(opt => {
-			this.$category_filter.$input.append(
-				$('<option>').val(opt).text(opt || 'All Categories')
-			);
-		});
-		if (current && opts.includes(current)) {
-			this.$category_filter.$input.val(current);
+		// Rebuild options on the underlying df and re-set value
+		const opts = ['All Categories'].concat(categories);
+		if (this.$category_filter.df) {
+			this.$category_filter.df.options = opts.join('\n');
+		}
+		// Find and update the <select> element directly
+		const $select = $(this.$category_filter.wrapper).find('select');
+		if ($select.length) {
+			$select.empty();
+			opts.forEach(opt => {
+				$select.append($('<option>').val(opt === 'All Categories' ? '' : opt).text(opt));
+			});
+			if (current && categories.includes(current)) {
+				$select.val(current);
+			}
 		}
 	}
 }
