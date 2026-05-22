@@ -2249,27 +2249,68 @@ class FinancialAuditDashboard {
 	<meta charset="utf-8">
 	<title>${title}</title>
 	<style>
-		body { font-family: Arial, sans-serif; margin: 20px; color: #1a1a2e; }
-		h2, h3, h4 { margin: 12px 0 6px; }
-		ul { padding-left: 20px; }
-		li { margin: 4px 0; }
-		p { margin: 6px 0; }
-		.ai-report-header { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: bold; margin-bottom: 16px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-		.ai-date { font-size: 13px; color: #555; margin-left: auto; }
-		.ai-summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
-		.ai-summary-card { border: 1px solid #ddd; border-radius: 8px; padding: 12px; }
-		.ai-summary-card .label { font-size: 11px; color: #666; }
-		.ai-summary-card .value { font-size: 18px; font-weight: bold; }
-		.ai-summary-card .sub { font-size: 11px; color: #888; }
-		.ai-section-title { font-weight: bold; font-size: 14px; margin: 16px 0 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
-		.ai-gauge { text-align: center; margin-bottom: 8px; }
-		.ai-gauge-circle { display: inline-block; border-radius: 50%; width: 100px; height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-width: 6px; border-style: solid; }
-		.ai-gauge-score { font-size: 28px; font-weight: bold; }
-		.ai-gauge-label { font-size: 11px; font-weight: 600; }
-		table { width: 100%; border-collapse: collapse; margin: 8px 0; }
-		th, td { border: 1px solid #ddd; padding: 6px 10px; text-align: left; font-size: 12px; }
-		th { background: #f5f5f5; font-weight: bold; }
-		@media print { body { margin: 0; } }
+		@page { size: A4 portrait; margin: 12mm 14mm; }
+		:root {
+			--fa-primary: #1a365d; --fa-primary-light: #2563eb; --fa-primary-lighter: #3b82f6; --fa-primary-bg: #eff6ff;
+			--fa-success: #15803d; --fa-success-light: #22c55e; --fa-success-bg: #f0fdf4;
+			--fa-danger: #dc2626; --fa-danger-light: #f87171; --fa-danger-bg: #fef2f2;
+			--fa-warning: #d97706; --fa-warning-light: #fbbf24; --fa-warning-bg: #fffbeb;
+			--fa-purple: #7c3aed; --fa-purple-bg: #f5f3ff;
+			--fa-teal: #0d9488; --fa-teal-bg: #f0fdfa;
+			--fa-orange: #ea580c; --fa-orange-bg: #fff7ed;
+			--fa-border: #e2e8f0; --fa-border-light: #f1f5f9;
+			--fa-bg-page: #f8fafc; --fa-bg-card: #ffffff; --fa-bg-subtle: #f8fafc;
+			--fa-text: #0f172a; --fa-text-mid: #1e293b; --fa-text-sub: #334155;
+			--fa-text-muted: #64748b; --fa-text-faint: #94a3b8;
+		}
+		*, *::before, *::after {
+			-webkit-print-color-adjust: exact !important;
+			print-color-adjust: exact !important;
+			box-sizing: border-box;
+		}
+		body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #0f172a; font-size: 11px; line-height: 1.5; }
+		h2 { font-size: 14px; margin: 10px 0 5px; } h3 { font-size: 13px; margin: 8px 0 4px; } h4 { font-size: 12px; margin: 6px 0 3px; }
+		ul { padding-left: 18px; margin: 4px 0; } li { margin: 2px 0; } p { margin: 4px 0; }
+		strong { font-weight: 700; } em { font-style: italic; }
+
+		.ai-report { width: 100%; }
+		.ai-report-header { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 800; margin-bottom: 12px; border-bottom: 3px solid #1a365d; padding-bottom: 8px; color: #1a365d; background: #eff6ff; padding: 10px 12px; border-radius: 6px; }
+		.ai-date { font-size: 11px; color: #64748b; margin-left: auto; font-weight: 500; }
+
+		/* Row 1: gauge + summary grid */
+		[style*="grid-template-columns:180px"] { display: grid !important; grid-template-columns: 160px 1fr !important; gap: 12px !important; margin-bottom: 12px !important; }
+		.ai-gauge { text-align: center; }
+		.ai-gauge-circle { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; width: 90px; height: 90px; margin: 0 auto; border-width: 6px; border-style: solid; }
+		.ai-gauge-score { font-size: 24px; font-weight: 800; line-height: 1; }
+		.ai-gauge-label { font-size: 10px; font-weight: 700; }
+
+		.ai-summary-grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 8px; margin-bottom: 12px; }
+		.ai-summary-card { border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px; background: #ffffff; }
+		.ai-summary-card .label { font-size: 10px; color: #64748b; font-weight: 600; text-transform: uppercase; }
+		.ai-summary-card .value { font-size: 15px; font-weight: 800; margin: 2px 0; }
+		.ai-summary-card .sub { font-size: 10px; color: #64748b; }
+
+		.ai-section-title { font-weight: 800; font-size: 12px; margin: 12px 0 6px; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px; color: #1a365d; display: flex; align-items: center; gap: 6px; }
+		.ai-text-body { font-size: 11px; line-height: 1.6; color: #1e293b; padding: 8px 0; }
+
+		table { width: 100%; border-collapse: collapse; margin: 6px 0; font-size: 10.5px; }
+		th { background: #1a365d !important; color: #ffffff !important; padding: 5px 8px; text-align: left; font-weight: 700; }
+		td { border: 1px solid #e2e8f0; padding: 4px 8px; }
+		tr:nth-child(even) td { background: #f8fafc !important; }
+
+		.ai-ratios-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+		.ai-ratio-card { border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px; background: #f8fafc !important; }
+		.ai-ratio-value { font-size: 18px; font-weight: 800; }
+		.ai-ratio-label { font-size: 10px; color: #64748b; font-weight: 600; }
+		.ai-ratio-bench { font-size: 10px; color: #64748b; }
+		.ai-ratio-status { font-size: 10px; font-weight: 700; }
+
+		@media print {
+			body { margin: 0; }
+			.ai-report { page-break-inside: auto; }
+			.ai-summary-card, .ai-ratio-card { page-break-inside: avoid; }
+			tr { page-break-inside: avoid; }
+		}
 	</style>
 </head>
 <body>
