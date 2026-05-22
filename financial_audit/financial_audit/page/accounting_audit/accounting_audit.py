@@ -67,32 +67,40 @@ def get_accounting_audit_data(filters=None):
 def check_company_defaults(companies):
     findings = []
 
+    # (field, severity, label, is_account)
+    # is_account=False means it's a non-account field — skip CoA existence check
     fields_config = [
-        ("default_receivable_account", "Critical", "Default Receivable Account"),
-        ("default_payable_account", "Critical", "Default Payable Account"),
-        ("default_bank_account", "Critical", "Default Bank Account"),
-        ("default_cash_account", "Warning", "Default Cash Account"),
-        ("default_expense_account", "Warning", "Default Expense Account"),
-        ("default_income_account", "Warning", "Default Income Account"),
-        ("cost_center", "Critical", "Default Cost Center"),
-        ("round_off_account", "Warning", "Round Off Account"),
-        ("write_off_account", "Warning", "Write Off Account"),
-        ("default_payroll_payable_account", "Warning", "Default Payroll Payable Account"),
-        ("inter_company_journal_entry_clearing_account", "Info", "Inter-Company Clearing Account"),
-        ("default_buying_terms", "Info", "Default Buying Terms"),
-        ("default_selling_terms", "Info", "Default Selling Terms"),
+        ("default_receivable_account", "Critical", "Default Receivable Account", True),
+        ("default_payable_account", "Critical", "Default Payable Account", True),
+        ("default_bank_account", "Critical", "Default Bank Account", True),
+        ("cost_center", "Critical", "Default Cost Center", False),
+        ("default_cash_account", "Warning", "Default Cash Account", True),
+        ("default_expense_account", "Warning", "Default Expense Account", True),
+        ("default_income_account", "Warning", "Default Income Account", True),
+        ("round_off_account", "Warning", "Round Off Account", True),
+        ("write_off_account", "Warning", "Write Off Account", True),
+        ("exchange_gain_loss_account", "Warning", "Exchange Gain/Loss Account", True),
+        ("default_payroll_payable_account", "Warning", "Default Payroll Payable Account", True),
+        ("default_expense_claim_payable_account", "Warning", "Expense Claim Payable Account", True),
+        ("stock_adjustment_account", "Warning", "Stock Adjustment Account", True),
+        ("accumulated_depreciation_account", "Warning", "Accumulated Depreciation Account", True),
+        ("depreciation_expense_account", "Warning", "Depreciation Expense Account", True),
+        ("default_inventory_account", "Warning", "Default Inventory Account", True),
+        ("capital_work_in_progress_account", "Info", "Capital WIP Account", True),
+        ("default_deferred_revenue_account", "Info", "Default Deferred Revenue Account", True),
+        ("default_deferred_expense_account", "Info", "Default Deferred Expense Account", True),
+        ("default_buying_terms", "Info", "Default Buying Terms", False),
+        ("default_selling_terms", "Info", "Default Selling Terms", False),
     ]
 
     field_names = [f[0] for f in fields_config] + ["name"]
     companies_data = frappe.get_all("Company", fields=field_names)
 
     # Get all existing accounts for quick lookup
-    existing_accounts = set(
-        frappe.get_all("Account", pluck="name")
-    )
+    existing_accounts = set(frappe.get_all("Account", pluck="name"))
 
     for company in companies_data:
-        for field, severity, label in fields_config:
+        for field, severity, label, is_account in fields_config:
             value = company.get(field)
             if not value:
                 findings.append({
@@ -106,8 +114,7 @@ def check_company_defaults(companies):
                     "action": f"Go to Company '{company['name']}' and set the {label} field.",
                     "link": f"Form/Company/{company['name']}",
                 })
-            elif field not in ("default_buying_terms", "default_selling_terms", "cost_center") and value not in existing_accounts:
-                # Account is set but doesn't exist
+            elif is_account and value not in existing_accounts:
                 findings.append({
                     "severity": severity,
                     "category": "Company Defaults",
@@ -356,7 +363,7 @@ def check_item_defaults(company_names):
     # Map: item -> {company: row}
     defaults_map = {}
     for row in defaults_rows:
-        item = row["parent"] if "parent" in row else row["item"]
+        item = row["item"]
         if item not in defaults_map:
             defaults_map[item] = {}
         defaults_map[item][row["company"]] = row
