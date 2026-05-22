@@ -31,7 +31,7 @@ def get_accounting_audit_data(filters=None):
 			"default_inventory_account", "capital_work_in_progress_account",
 			"default_deferred_revenue_account", "default_deferred_expense_account",
 			"default_buying_terms", "default_selling_terms",
-			"perpetual_inventory",
+			"enable_perpetual_inventory",
 		],
 	)
 	# Single full Account scan — shared across all checks that need CoA validation
@@ -496,7 +496,7 @@ def check_warehouse_accounts(companies_data):
 	findings = []
 
 	# Companies with perpetual inventory get Critical; others get Warning
-	perpetual_companies = {c["name"] for c in companies_data if c.get("perpetual_inventory")}
+	perpetual_companies = {c["name"] for c in companies_data if c.get("enable_perpetual_inventory")}
 
 	warehouses = frappe.get_all(
 		"Warehouse",
