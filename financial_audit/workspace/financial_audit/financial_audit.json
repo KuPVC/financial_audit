@@ -1,0 +1,73 @@
+{
+ "content": [
+  {
+   "id": "header-overview",
+   "type": "header",
+   "data": {"text": "Financial Audit Overview", "level": 4, "col": 12}
+  },
+  {
+   "id": "shortcut-financial-audit",
+   "type": "shortcut",
+   "data": {"shortcut_name": "Financial Audit Dashboard", "col": 4}
+  },
+  {
+   "id": "shortcut-settings",
+   "type": "shortcut",
+   "data": {"shortcut_name": "Financial Audit Settings", "col": 4}
+  },
+  {
+   "id": "shortcut-accounting-audit",
+   "type": "shortcut",
+   "data": {"shortcut_name": "Accounting Audit Dashboard", "col": 4}
+  }
+ ],
+ "charts": [],
+ "creation": "2026-02-15",
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "icon": "accounting",
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "Financial Audit",
+ "modified": "2026-02-15",
+ "modified_by": "Administrator",
+ "module": "Financial Audit",
+ "name": "financial-audit",
+ "number_cards": [],
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Accounts Manager"
+  }
+ ],
+ "shortcuts": [
+  {
+   "type": "Page",
+   "link_to": "financial-audit",
+   "color": "Blue",
+   "label": "Financial Audit Dashboard",
+   "format": "{}"
+  },
+  {
+   "type": "DocType",
+   "link_to": "Financial Audit Settings",
+   "color": "Green",
+   "label": "Financial Audit Settings",
+   "format": "{}"
+  },
+  {
+   "type": "Page",
+   "link_to": "accounting-audit",
+   "color": "Purple",
+   "label": "Accounting Audit Dashboard",
+   "format": "{}"
+  }
+ ],
+ "sequence_id": 0,
+ "shortcut_label": "Financial Audit",
+ "title": "Financial Audit",
+ "type": "Workspace"
+}
