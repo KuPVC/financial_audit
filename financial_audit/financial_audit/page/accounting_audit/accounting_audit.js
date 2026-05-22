@@ -138,13 +138,45 @@ frappe.pages['accounting-audit'].on_page_show = function(wrapper) {
 }
 .aa-result-count { font-weight: 600; }
 
-/* ── Findings Table ── */
-.aa-findings {
-	overflow-x: auto;
-	border-radius: 10px;
+/* ── Category Section ── */
+.aa-category-section {
 	border: 1px solid #e2e8f0;
-	box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+	border-radius: 10px;
+	margin-bottom: 16px;
+	overflow: hidden;
+	box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
+.aa-category-header {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 16px;
+	background: #f8fafc;
+	cursor: pointer;
+	user-select: none;
+	border-bottom: 1px solid #e2e8f0;
+}
+.aa-category-header:hover { background: #f1f5f9; }
+.aa-category-name {
+	font-weight: 700;
+	font-size: 0.95rem;
+	color: #1e293b;
+	flex: 1;
+}
+.aa-category-pills { display: flex; gap: 6px; align-items: center; }
+.aa-pill {
+	display: inline-flex; align-items: center; gap: 4px;
+	padding: 2px 8px; border-radius: 999px;
+	font-size: 0.72rem; font-weight: 700;
+}
+.aa-pill-critical { background: #fee2e2; color: #b91c1c; }
+.aa-pill-warning  { background: #fef3c7; color: #92400e; }
+.aa-pill-info     { background: #dbeafe; color: #1d4ed8; }
+.aa-chevron { color: #94a3b8; transition: transform .2s; font-size: 0.85rem; }
+.aa-chevron.collapsed { transform: rotate(-90deg); }
+.aa-category-body { overflow-x: auto; }
+
+/* ── Findings Table ── */
 .aa-table {
 	width: 100%;
 	border-collapse: collapse;
@@ -208,6 +240,9 @@ frappe.pages['accounting-audit'].on_page_show = function(wrapper) {
 	padding: 2px 6px;
 	border-radius: 4px;
 	transition: background .12s;
+	background: transparent;
+	border: none;
+	cursor: pointer;
 }
 .aa-link-btn:hover { background: #eef2ff; text-decoration: underline; }
 
@@ -482,29 +517,75 @@ class AccountingAuditDashboard {
 			return;
 		}
 
-		const rows = findings.map(f => this._render_row(f)).join('');
+		// Group findings by category
+		const groups = {};
+		findings.forEach(f => {
+			const cat = f.category || 'Other';
+			if (!groups[cat]) groups[cat] = [];
+			groups[cat].push(f);
+		});
 
-		container.innerHTML = `
-<table class="aa-table">
-	<thead>
-		<tr>
-			<th>Severity</th>
-			<th>Category</th>
-			<th>DocType</th>
-			<th>Record</th>
-			<th>Company</th>
-			<th>Issue</th>
-			<th>Recommended Action</th>
-			<th>Open</th>
-		</tr>
-	</thead>
-	<tbody id="aa-tbody">
-		${rows}
-	</tbody>
-</table>`;
+		const categoryIcons = {
+			'Company Defaults': 'fa fa-building',
+			'Salary':           'fa fa-money',
+			'Asset':            'fa fa-cubes',
+			'Tax':              'fa fa-percent',
+			'Inventory':        'fa fa-boxes',
+			'Payment':          'fa fa-credit-card',
+			'Banking':          'fa fa-bank',
+			'HR':               'fa fa-users',
+			'Payroll':          'fa fa-file-text',
+		};
+
+		let html = '';
+		Object.entries(groups).forEach(([category, items]) => {
+			const counts = { critical: 0, warning: 0, info: 0 };
+			items.forEach(f => { counts[(f.severity || 'Info').toLowerCase()]++; });
+
+			const pills = [
+				counts.critical ? `<span class="aa-pill aa-pill-critical"><i class="fa fa-exclamation-circle"></i> ${counts.critical} Critical</span>` : '',
+				counts.warning  ? `<span class="aa-pill aa-pill-warning"><i class="fa fa-exclamation-triangle"></i> ${counts.warning} Warning</span>` : '',
+				counts.info     ? `<span class="aa-pill aa-pill-info"><i class="fa fa-info-circle"></i> ${counts.info} Info</span>` : '',
+			].filter(Boolean).join('');
+
+			const iconClass = categoryIcons[category] || 'fa fa-folder';
+			const rows = items.map(f => this._render_row(f, true)).join('');
+
+			html += `
+<div class="aa-category-section">
+	<div class="aa-category-header" onclick="
+		var body = this.nextElementSibling;
+		body.style.display = body.style.display === 'none' ? '' : 'none';
+		this.querySelector('.aa-chevron').classList.toggle('collapsed');
+	">
+		<i class="${iconClass}" style="color:#6366f1;font-size:1.1rem;flex-shrink:0;"></i>
+		<span class="aa-category-name">${category}</span>
+		<span class="aa-category-pills">${pills}</span>
+		<i class="fa fa-chevron-down aa-chevron"></i>
+	</div>
+	<div class="aa-category-body">
+		<table class="aa-table">
+			<thead>
+				<tr>
+					<th>Severity</th>
+					<th>DocType</th>
+					<th>Record</th>
+					<th>Company</th>
+					<th>Issue</th>
+					<th>Recommended Action</th>
+					<th>Open</th>
+				</tr>
+			</thead>
+			<tbody>${rows}</tbody>
+		</table>
+	</div>
+</div>`;
+		});
+
+		container.innerHTML = html;
 	}
 
-	_render_row(f) {
+	_render_row(f, in_category) {
 		const sev  = (f.severity || 'Info').toLowerCase();
 		const icon = {
 			critical: 'fa fa-exclamation-circle',
@@ -514,18 +595,23 @@ class AccountingAuditDashboard {
 
 		const badge = `<span class="aa-badge aa-badge-${sev}"><i class="${icon}"></i>${f.severity || 'Info'}</span>`;
 
-		const link  = f.link
-			? `<a class="aa-link-btn" href="/${f.link}" target="_blank">
+		let link = '';
+		if (f.link) {
+			// f.link is like "Form/Company/Name" or "List/Employee/List"
+			const parts = f.link.split('/').filter(Boolean);
+			if (parts.length >= 2) {
+				const routeArgs = parts.map(p => JSON.stringify(p)).join(', ');
+				link = `<button class="aa-link-btn" onclick="frappe.set_route(${routeArgs})">
 					<i class="fa fa-external-link"></i> Open
-			   </a>`
-			: '';
+				</button>`;
+			}
+		}
 
 		const esc = s => (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
 		return `
 <tr class="aa-row-${sev}">
 	<td>${badge}</td>
-	<td><strong>${esc(f.category)}</strong></td>
 	<td style="white-space:nowrap;">${esc(f.doctype)}</td>
 	<td style="max-width:180px;word-break:break-all;">${esc(f.record)}</td>
 	<td style="white-space:nowrap;">${esc(f.company)}</td>
