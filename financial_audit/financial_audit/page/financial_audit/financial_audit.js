@@ -2233,33 +2233,51 @@ class FinancialAuditDashboard {
 			return;
 		}
 
-		// Expand all collapsed sections before printing
-		const $page = this.page.main.find('.financial-audit-page');
-		const $collapsed_bodies = $page.find('.section-body:hidden');
-		const $collapsed_chevrons = $page.find('.toggle-chevron.collapsed');
-		$collapsed_bodies.show();
-		$collapsed_chevrons.removeClass('collapsed');
+		const $ai_report = this.$ai_body.find('.ai-report');
+		if (!$ai_report.length || !$ai_report.html().trim()) {
+			frappe.msgprint(this.t('ai_no_response') || 'Please run AI Analysis first before exporting.');
+			return;
+		}
 
-		// Add print class for enhanced print styling
-		$page.addClass('pdf-export-mode');
+		const report_html = $ai_report[0].outerHTML;
+		const title = `${this.t('pdf_title') || 'AI Financial Audit Report'} - ${this.data.company} - ${this.data.from_date} to ${this.data.to_date}`;
 
-		// Set document title for PDF filename
-		const orig_title = document.title;
-		document.title = `${this.t('pdf_title')} - ${this.data.company} - ${this.data.from_date} ${this.t('ai_to')} ${this.data.to_date}`;
-
-		// Trigger print
-		setTimeout(() => {
-			window.print();
-
-			// Restore state after print dialog
-			setTimeout(() => {
-				$page.removeClass('pdf-export-mode');
-				document.title = orig_title;
-				// Re-collapse sections that were collapsed
-				$collapsed_bodies.hide();
-				$collapsed_chevrons.addClass('collapsed');
-			}, 500);
-		}, 300);
+		const print_win = window.open('', '_blank');
+		print_win.document.write(`<!DOCTYPE html>
+<html dir="${this.is_rtl ? 'rtl' : 'ltr'}">
+<head>
+	<meta charset="utf-8">
+	<title>${title}</title>
+	<style>
+		body { font-family: Arial, sans-serif; margin: 20px; color: #1a1a2e; }
+		h2, h3, h4 { margin: 12px 0 6px; }
+		ul { padding-left: 20px; }
+		li { margin: 4px 0; }
+		p { margin: 6px 0; }
+		.ai-report-header { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: bold; margin-bottom: 16px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+		.ai-date { font-size: 13px; color: #555; margin-left: auto; }
+		.ai-summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+		.ai-summary-card { border: 1px solid #ddd; border-radius: 8px; padding: 12px; }
+		.ai-summary-card .label { font-size: 11px; color: #666; }
+		.ai-summary-card .value { font-size: 18px; font-weight: bold; }
+		.ai-summary-card .sub { font-size: 11px; color: #888; }
+		.ai-section-title { font-weight: bold; font-size: 14px; margin: 16px 0 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+		.ai-gauge { text-align: center; margin-bottom: 8px; }
+		.ai-gauge-circle { display: inline-block; border-radius: 50%; width: 100px; height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-width: 6px; border-style: solid; }
+		.ai-gauge-score { font-size: 28px; font-weight: bold; }
+		.ai-gauge-label { font-size: 11px; font-weight: 600; }
+		table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+		th, td { border: 1px solid #ddd; padding: 6px 10px; text-align: left; font-size: 12px; }
+		th { background: #f5f5f5; font-weight: bold; }
+		@media print { body { margin: 0; } }
+	</style>
+</head>
+<body>
+	${report_html}
+	<script>window.onload = function(){ window.print(); window.onafterprint = function(){ window.close(); }; };<\/script>
+</body>
+</html>`);
+		print_win.document.close();
 	}
 
 	// ─── Custom Layout ──────────────────────────────────────
