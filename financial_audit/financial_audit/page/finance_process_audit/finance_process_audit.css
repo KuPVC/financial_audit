@@ -1,0 +1,373 @@
+/* ═══════════════════════════════════════════════════════════
+   Finance Process Exception & Compliance Dashboard — Styles
+   Extends financial_audit.css design system
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Google Font ── */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ── Root Variables (matches financial_audit.css palette) ── */
+.financial-audit-page {
+	--fa-primary: #4361ee;
+	--fa-primary-light: #8b5cf6;
+	--fa-border: #e5e7eb;
+	--fa-bg: #f8fafc;
+	--fa-card-bg: #ffffff;
+	--fa-text: #1e293b;
+	--fa-text-mid: #475569;
+	--fa-text-muted: #94a3b8;
+	--fa-green: #047857;
+	--fa-red: #b91c1c;
+	--fa-orange: #b45309;
+	font-family: 'Cairo', 'Segoe UI', Arial, sans-serif;
+	color: var(--fa-text);
+	background: var(--fa-bg);
+	padding: 0 0 40px 0;
+}
+
+/* ── Filters ── */
+.filters-section { padding: 16px 0 12px; }
+.filters-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.filter-field { display: flex; flex-direction: column; gap: 4px; }
+.filter-field label { font-size: 11px; font-weight: 700; color: var(--fa-text-mid); text-transform: uppercase; letter-spacing: 0.4px; }
+.filter-field .frappe-control { min-width: 180px; }
+
+/* ── Score Cards ── */
+.fpa-scores { margin-bottom: 20px; }
+.kpi-cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+	gap: 12px;
+	margin-top: 8px;
+}
+.kpi-card {
+	background: var(--fa-card-bg);
+	border-radius: 12px;
+	border: 1px solid var(--fa-border);
+	padding: 14px 16px;
+	box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+	transition: box-shadow 0.2s;
+}
+.kpi-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+.kpi-icon { font-size: 18px; margin-bottom: 6px; opacity: 0.85; }
+.kpi-title { font-size: 11px; font-weight: 700; color: var(--fa-text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+.kpi-value { font-size: 20px; font-weight: 800; line-height: 1.2; margin-bottom: 4px; }
+.kpi-desc { font-size: 11px; color: var(--fa-text-muted); }
+
+/* ── Summary Bar ── */
+.fpa-summary-bar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	padding: 10px 14px;
+	background: #f8fafc;
+	border-radius: 8px;
+	border: 1px solid var(--fa-border);
+	margin-bottom: 14px;
+}
+.fpa-sum-item {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 12px;
+	padding: 4px 10px;
+	border-radius: 20px;
+	font-weight: 600;
+	white-space: nowrap;
+}
+.fpa-sum-item.total   { background: #f1f5f9; color: #475569; }
+.fpa-sum-item.critical{ background: #fef2f2; color: #b91c1c; }
+.fpa-sum-item.high    { background: #fff7ed; color: #b45309; }
+.fpa-sum-item.medium  { background: #fefce8; color: #854d0e; }
+.fpa-sum-item.low     { background: #f0fdf4; color: #166534; }
+.fpa-sum-item.value   { background: #eef2ff; color: #3730a3; }
+.fpa-sum-item.overdue { background: #fef2f2; color: #9f1239; }
+
+/* ── Module Section Subsection Titles ── */
+.fpa-subsection-title {
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--fa-text-mid);
+	margin: 12px 0 8px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding-bottom: 6px;
+	border-bottom: 1px solid var(--fa-border);
+}
+.fpa-badge-count {
+	background: var(--fa-primary);
+	color: #fff;
+	border-radius: 10px;
+	padding: 1px 7px;
+	font-size: 11px;
+	font-weight: 700;
+}
+
+/* ── Data Section ── */
+.data-section {
+	background: var(--fa-card-bg);
+	border-radius: 14px;
+	border: 1px solid var(--fa-border);
+	margin-bottom: 16px;
+	overflow: hidden;
+	box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+}
+.fpa-module-section { }
+
+.section-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 14px 18px;
+	cursor: pointer;
+	user-select: none;
+	background: var(--fa-card-bg);
+	transition: background 0.15s;
+}
+.section-header:hover { background: #f8fafc; }
+.section-title {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 14px;
+	font-weight: 700;
+	color: var(--fa-text);
+}
+.section-icon {
+	width: 32px;
+	height: 32px;
+	border-radius: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 14px;
+	flex-shrink: 0;
+}
+.section-desc {
+	font-size: 12px;
+	color: var(--fa-text-muted);
+	padding: 0 18px 12px;
+	line-height: 1.5;
+}
+.section-body {
+	padding: 0 18px 18px;
+}
+.toggle-chevron {
+	color: var(--fa-text-muted);
+	font-size: 12px;
+	transition: transform 0.2s;
+}
+.toggle-chevron.collapsed { transform: rotate(-90deg); }
+
+/* ── AI Analysis Section ── */
+.ai-analysis-section {
+	background: linear-gradient(135deg, #f8f4ff 0%, #fff 100%);
+	border-radius: 14px;
+	border: 1px solid #d8b4fe;
+	margin-bottom: 16px;
+	overflow: hidden;
+}
+.ai-header { background: transparent; }
+.ai-header:hover { background: rgba(139,92,246,0.04); }
+
+/* ── Audit Table ── */
+.audit-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 12.5px;
+}
+.audit-table th {
+	background: #f8fafc;
+	padding: 9px 12px;
+	text-align: start;
+	font-weight: 700;
+	color: var(--fa-text-mid);
+	border-bottom: 2px solid var(--fa-border);
+	font-size: 11px;
+	text-transform: uppercase;
+	letter-spacing: 0.3px;
+	white-space: nowrap;
+}
+.audit-table td {
+	padding: 9px 12px;
+	border-bottom: 1px solid #f1f5f9;
+	color: var(--fa-text);
+	vertical-align: middle;
+}
+.audit-table tr:last-child td { border-bottom: none; }
+.audit-table tr:hover td { background: #fafafa; }
+.audit-table .currency-cell { text-align: end; font-variant-numeric: tabular-nums; font-weight: 600; }
+.audit-table .link-cell a { color: var(--fa-primary); text-decoration: none; }
+.audit-table .link-cell a:hover { text-decoration: underline; }
+.table-responsive { overflow-x: auto; }
+
+/* ── Priority Badges ── */
+.risk-badge-critical {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	background: #fef2f2;
+	color: #b91c1c;
+	border: 1px solid #fecaca;
+	border-radius: 12px;
+	padding: 2px 8px;
+	font-size: 11px;
+	font-weight: 700;
+	white-space: nowrap;
+}
+.risk-badge-high {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	background: #fff7ed;
+	color: #c2410c;
+	border: 1px solid #fed7aa;
+	border-radius: 12px;
+	padding: 2px 8px;
+	font-size: 11px;
+	font-weight: 700;
+	white-space: nowrap;
+}
+.risk-badge-medium {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	background: #fefce8;
+	color: #854d0e;
+	border: 1px solid #fef08a;
+	border-radius: 12px;
+	padding: 2px 8px;
+	font-size: 11px;
+	font-weight: 700;
+	white-space: nowrap;
+}
+.risk-badge-low {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	background: #f0fdf4;
+	color: #166534;
+	border: 1px solid #bbf7d0;
+	border-radius: 12px;
+	padding: 2px 8px;
+	font-size: 11px;
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+/* ── AI Report ── */
+.ai-report {
+	font-family: 'Cairo', sans-serif;
+	font-size: 13px;
+	line-height: 1.7;
+}
+.ai-report-header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 12px 0 16px;
+	border-bottom: 2px solid var(--fa-border);
+	margin-bottom: 16px;
+	font-weight: 700;
+	font-size: 15px;
+	color: var(--fa-text);
+}
+.ai-date {
+	font-size: 11px;
+	color: var(--fa-text-muted);
+	font-weight: 400;
+	margin-inline-start: auto;
+}
+.ai-section-title {
+	font-weight: 700;
+	font-size: 13px;
+	margin-bottom: 10px;
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	color: var(--fa-text);
+}
+.ai-summary-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+	gap: 10px;
+	margin-bottom: 16px;
+}
+.ai-summary-card {
+	background: #f8fafc;
+	border-radius: 10px;
+	border: 1px solid var(--fa-border);
+	padding: 10px 12px;
+}
+.ai-summary-card .label { font-size: 10px; font-weight: 700; color: var(--fa-text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+.ai-summary-card .value { font-size: 18px; font-weight: 800; line-height: 1.2; }
+.ai-summary-card .sub { font-size: 10px; color: var(--fa-text-muted); margin-top: 2px; }
+.ai-report-content { font-size: 13px; line-height: 1.8; color: var(--fa-text); }
+.ai-report-content h2 { font-size: 16px; font-weight: 800; margin: 16px 0 8px; }
+.ai-report-content h3 { font-size: 14px; font-weight: 700; margin: 14px 0 6px; }
+.ai-report-content h4 { font-size: 13px; font-weight: 700; margin: 12px 0 4px; color: var(--fa-primary); }
+.ai-report-content ul { padding-inline-start: 20px; margin: 8px 0; }
+.ai-report-content li { margin-bottom: 4px; }
+.ai-report-content strong { color: var(--fa-text); }
+
+/* ── Loading & Empty States ── */
+.loading-state {
+	text-align: center;
+	padding: 40px 20px;
+	color: var(--fa-text-muted);
+	font-size: 14px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+}
+.loading-state .fa-spinner { font-size: 24px; color: var(--fa-primary); }
+.empty-state {
+	text-align: center;
+	padding: 30px 20px;
+	color: var(--fa-text-muted);
+}
+.empty-icon { font-size: 32px; margin-bottom: 8px; opacity: 0.4; }
+.empty-state p { font-size: 13px; margin: 0; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+	.kpi-cards { grid-template-columns: repeat(2, 1fr); }
+	.ai-summary-grid { grid-template-columns: repeat(2, 1fr); }
+	.filters-row { flex-direction: column; }
+	.filter-field .frappe-control { min-width: 100%; }
+	.fpa-summary-bar { gap: 6px; }
+}
+@media (max-width: 480px) {
+	.kpi-cards { grid-template-columns: 1fr 1fr; }
+	.kpi-value { font-size: 16px; }
+}
+
+/* ── Print / PDF ── */
+@media print {
+	.page-head, .navbar, .sidebar, .page-actions { display: none !important; }
+	.financial-audit-page { padding: 0; background: #fff; }
+	.kpi-card { break-inside: avoid; box-shadow: none; border: 1px solid #ddd; }
+	.data-section { break-inside: avoid; box-shadow: none; border: 1px solid #ddd; margin-bottom: 8px; }
+	.section-body { display: block !important; }
+	.section-header { border-bottom: 2px solid #e5e7eb; }
+	.toggle-chevron, .fpa-module-ai-btn { display: none !important; }
+	.ai-analysis-section { display: none !important; }
+	.audit-table th { background: #f0f0f0; }
+}
+
+/* ── RTL adjustments ── */
+[dir="rtl"] .audit-table th,
+[dir="rtl"] .audit-table td { text-align: right; }
+[dir="rtl"] .audit-table .currency-cell { text-align: left; }
+[dir="rtl"] .kpi-icon { margin-left: 0; }
+
+/* ── Color utilities (used in JS inline styles) ── */
+.positive { color: var(--fa-green) !important; }
+.negative { color: var(--fa-red) !important; }
+.warning-text { color: var(--fa-orange) !important; }
+.danger-text { color: var(--fa-red) !important; }
+.profit-text { color: var(--fa-green) !important; }
+.text-muted { color: var(--fa-text-muted) !important; }
+.text-center { text-align: center; }
