@@ -19,6 +19,11 @@
    "id": "shortcut-accounting-audit",
    "type": "shortcut",
    "data": {"shortcut_name": "Accounting Audit Dashboard", "col": 4}
+  },
+  {
+   "id": "shortcut-finance-process-audit",
+   "type": "shortcut",
+   "data": {"shortcut_name": "Finance Process Exception Dashboard", "col": 4}
   }
  ],
  "charts": [],
@@ -63,6 +68,13 @@
    "link_to": "accounting-audit",
    "color": "Purple",
    "label": "Accounting Audit Dashboard",
+   "format": "{}"
+  },
+  {
+   "type": "Page",
+   "link_to": "finance-process-audit",
+   "color": "Red",
+   "label": "Finance Process Exception Dashboard",
    "format": "{}"
   }
  ],

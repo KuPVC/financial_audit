@@ -1,0 +1,57 @@
+{
+ "app": "financial_audit",
+ "charts": [],
+ "content": "[{\"id\":\"header-overview\",\"type\":\"header\",\"data\":{\"text\":\"Financial Audit Overview\",\"level\":4,\"col\":12}},{\"id\":\"shortcut-financial-audit\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Financial Audit Dashboard\",\"col\":4}},{\"id\":\"shortcut-accounting-audit\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Accounting Audit Dashboard\",\"col\":4}},{\"id\":\"shortcut-finance-process-audit\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Finance Process Exception Dashboard\",\"col\":4}},{\"id\":\"shortcut-settings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Financial Audit Settings\",\"col\":4}}]",
+ "creation": "2026-05-25 00:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "icon": "accounting",
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "Financial Audit",
+ "modified": "2026-05-25 13:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Financial Audit",
+ "name": "fa-home",
+ "number_cards": [],
+ "owner": "Administrator",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {"role": "System Manager"},
+  {"role": "Accounts Manager"}
+ ],
+ "shortcuts": [
+  {
+   "color": "Blue",
+   "format": "{}",
+   "label": "Financial Audit Dashboard",
+   "link_to": "financial-audit",
+   "type": "Page"
+  },
+  {
+   "color": "Purple",
+   "format": "{}",
+   "label": "Accounting Audit Dashboard",
+   "link_to": "accounting-audit",
+   "type": "Page"
+  },
+  {
+   "color": "Red",
+   "format": "{}",
+   "label": "Finance Process Exception Dashboard",
+   "link_to": "finance-process-audit",
+   "type": "Page"
+  },
+  {
+   "color": "Green",
+   "format": "{}",
+   "label": "Financial Audit Settings",
+   "link_to": "Financial Audit Settings",
+   "type": "DocType"
+  }
+ ],
+ "sequence_id": 0,
+ "title": "Financial Audit",
+ "type": "Workspace"
+}
